@@ -342,7 +342,8 @@ $RECYCLE.BIN/
 .LSOverride
 
 # Icon must end with two \r
-Icon
+Icon
+
 
 # Thumbnails
 ._*
@@ -364,3 +365,5 @@ Temporary Items
 .apdisk
 
 
+### Project specific
+src_*/requirements.txt
