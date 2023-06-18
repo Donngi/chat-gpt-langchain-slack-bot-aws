@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "gateway"
+version = "0.1.0"
+description = ""
+authors = ["Jimon-s <22317839+Jimon-s@users.noreply.github.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+boto3 = "^1.26.155"
+
+[tool.poetry.group.dev.dependencies]
+mypy = "^1.3.0"
+ruff = "^0.0.272"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
