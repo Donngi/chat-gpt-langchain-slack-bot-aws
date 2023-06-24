@@ -14,20 +14,22 @@ terraform-apply:
 	terraform apply
 
 ### Build images
-push-images: push-image-chat-gpt-requester push-image-gateway
-
-push-image-chat-gpt-requester:
+define push_image
 	set -a && source .env && set +a && \
 	cd src_chat_gpt_requester && \
 	make build-image && \
+	LATEST_TAG=$$(aws ecr list-images --repository-name $(1) --output json | jq -r '.imageIds[].imageTag' | grep "^v[0-9]\+$$" | sed 's/v//g' | sort -nr | head -n1) && \
+	NEW_TAG="v$$(( $${LATEST_TAG:-0} + 1))" && \
 	aws ecr get-login-password --region $${ECR_AWS_REGION} | docker login --username AWS --password-stdin $${ECR_AWS_ACCOUNT_ID}.dkr.ecr.$${ECR_AWS_REGION}.amazonaws.com && \
-	docker tag lambda-slack-bot-chat-gpt-requester:latest $${ECR_AWS_ACCOUNT_ID}.dkr.ecr.$${ECR_AWS_REGION}.amazonaws.com/lambda-slack-bot-chat-gpt-requester:latest && \
-	docker push $${ECR_AWS_ACCOUNT_ID}.dkr.ecr.$${ECR_AWS_REGION}.amazonaws.com/lambda-slack-bot-chat-gpt-requester:latest
+	docker tag $(1):latest $${ECR_AWS_ACCOUNT_ID}.dkr.ecr.$${ECR_AWS_REGION}.amazonaws.com/$(1):$${NEW_TAG} && \
+	docker push $${ECR_AWS_ACCOUNT_ID}.dkr.ecr.$${ECR_AWS_REGION}.amazonaws.com/$(1):$${NEW_TAG}
+endef
+
+push-images: push-image-chat-gpt-requester push-image-gateway
+
+push-image-chat-gpt-requester:
+	$(call push_image,lambda-slack-bot-chat-gpt-requester)
 
 push-image-gateway:
-	set -a && source .env && set +a && \
-	cd src_gateway && \
-	make build-image && \
-	aws ecr get-login-password --region $${ECR_AWS_REGION} | docker login --username AWS --password-stdin $${ECR_AWS_ACCOUNT_ID}.dkr.ecr.$${ECR_AWS_REGION}.amazonaws.com && \
-	docker tag lambda-slack-bot-gateway:latest $${ECR_AWS_ACCOUNT_ID}.dkr.ecr.$${ECR_AWS_REGION}.amazonaws.com/lambda-slack-bot-gateway:latest && \
-	docker push $${ECR_AWS_ACCOUNT_ID}.dkr.ecr.$${ECR_AWS_REGION}.amazonaws.com/lambda-slack-bot-gateway:latest
+	$(call push_image,lambda-slack-bot-gateway)
+
