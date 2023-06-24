@@ -13,6 +13,10 @@ terraform-apply:
 	cd terraform/envs/example && \
 	terraform apply
 
+terraform-apply-auto-approve:
+	cd terraform/envs/example && \
+	terraform apply --auto-approve
+	
 ### Build images
 define push_image
 	set -a && source .env && set +a && \
