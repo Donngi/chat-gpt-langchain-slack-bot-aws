@@ -38,6 +38,13 @@ resource "aws_iam_policy" "lambda_gateway_custom" {
           data.aws_ssm_parameter.signing_secret.arn,
         ],
       },
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "lambda:InvokeFunction",
+        ],
+        "Resource" : aws_lambda_function.chat_gpt_requester.arn,
+      }
     ]
   })
 }
