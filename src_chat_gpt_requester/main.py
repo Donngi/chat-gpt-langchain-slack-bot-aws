@@ -1,6 +1,6 @@
 import logging
 import os
-from typing import Any, Dict, TypedDict
+from typing import Any, Callable, Dict, TypedDict
 
 import boto3
 from langchain.chat_models import ChatOpenAI
@@ -47,23 +47,23 @@ EventTypeDef = TypedDict(
 )
 
 
-def update_wait_a_moment_message(
-    text: str,
-    client: WebClient,
-    channel: str,
-    ts: str,
-) -> None:
-    client.chat_update(
-        channel=channel,
-        ts=ts,
-        text=text,
-    )
+def get_update_wait_a_moment_message(
+    client: WebClient, channel: str, ts: str
+) -> Callable[[str], None]:
+    def update_wait_a_moment_message(text: str) -> None:
+        client.chat_update(
+            channel=channel,
+            ts=ts,
+            text=text,
+        )
+
+    return update_wait_a_moment_message
 
 
 def get_prompt_messages(unfiltered_messages: list[MessageTypeDef]) -> list[BaseMessage]:
     """
     Get the messages to be used as the prompt for the GPT.
-    
+
     1. Convert the messages from the thread into a list of BaseMessage objects.
     2. Remove wait a moment message.
     3. Add a system message to the beginning of the list.
@@ -85,6 +85,9 @@ def handler(event: EventTypeDef, context: Dict[str, Any]) -> None:
     logger.debug(f"event: {event}")
 
     slack_client = WebClient(token=bot_user_token)
+    update_wait_a_moment_message = get_update_wait_a_moment_message(
+        client=slack_client, channel=event["channel"], ts=event["wait_a_moment_ts"]
+    )
 
     try:
         messages = get_prompt_messages(event["thread_messages"])
@@ -94,17 +97,7 @@ def handler(event: EventTypeDef, context: Dict[str, Any]) -> None:
         res_chat_gpt = chat.predict_messages(messages=messages)
         logger.debug(f"res_chat_gpt: {res_chat_gpt}")
 
-        update_wait_a_moment_message(
-            text=res_chat_gpt.content,
-            client=slack_client,
-            channel=event["channel"],
-            ts=event["wait_a_moment_ts"],
-        )
+        update_wait_a_moment_message(res_chat_gpt.content)
     except Exception as e:
         logger.error(e)
-        update_wait_a_moment_message(
-            text="Sorry something went wrong.",
-            client=slack_client,
-            channel=event["channel"],
-            ts=event["wait_a_moment_ts"],
-        )
+        update_wait_a_moment_message("Sorry something went wrong.")
