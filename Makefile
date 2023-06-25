@@ -1,5 +1,5 @@
 ### Provision all AWS resources
-setup-all-resources: terraform-init terraform-apply-only-ecr push-images terraform-apply-auto-approve
+setup-all-resources: terraform-init terraform-apply-only-ecr-auto-approve push-images terraform-apply-auto-approve
 
 ### Terraform
 terraform-apply-only-ecr:
@@ -7,6 +7,13 @@ terraform-apply-only-ecr:
 	terraform apply \
 	-target module.slack_bot.aws_ecr_repository.lambda_gateway \
 	-target module.slack_bot.aws_ecr_repository.lambda_chat_gpt_requester
+
+terraform-apply-only-ecr-auto-approve:
+	cd terraform/envs/example && \
+	terraform apply \
+	-target module.slack_bot.aws_ecr_repository.lambda_gateway \
+	-target module.slack_bot.aws_ecr_repository.lambda_chat_gpt_requester \
+	--auto-approve
 
 terraform-init:
 	cd terraform/envs/example && \

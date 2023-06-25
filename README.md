@@ -99,7 +99,18 @@ make setup-all-resources
 
 ### Step 4: Replace event subscription url
 
-Check your API Gateway url and set it by slack app console.
+Check your API Gateway id and set it by slack app console.
+
+This command returns the api id of your API Gateway.
+
+```bash
+aws apigateway get-rest-apis --query 'items[?name==`chat-gpt-langchain-slack-bot`].id' --output text
+```
+
+```md
+before: https://xxxxxxxxxx.execute-api.ap-northeast-1.amazonaws.com/main/slack
+after: https://${YOUR_API_GATEWAY_ID}.execute-api.ap-northeast-1.amazonaws.com/main/slack
+```
 
 ## For development
 This repository is designed to have individual development settings for each lambda's Python code.
