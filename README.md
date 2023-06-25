@@ -6,6 +6,10 @@ This repo also contains terraform templates. You can setup AWS resources only ex
 ## Architecture
 ![Architecture](doc/architecture.drawio.svg)
 
+Lambda is provisioned by container mode because the size of LangChain is large and exceeds the limit of zip mode.
+
+NOTE: To be more specific, although the gateway lambda is not using LangChain and could therefore be provisioned in zip mode, we have standardized on container mode in order to align the technologies being used.
+
 ## Sequence
 ```mermaid
 sequenceDiagram
