@@ -5,7 +5,7 @@ from logging import Logger
 from typing import Any, Dict, cast
 
 import boto3
-from slack_bolt import App
+from slack_bolt import App, BoltContext
 from slack_bolt.adapter.aws_lambda import SlackRequestHandler
 from slack_bolt.context.say import Say
 from slack_sdk import WebClient
@@ -44,6 +44,7 @@ def handle_app_mentions(
     client: WebClient,
     say: Say,
     logger: Logger,
+    context: BoltContext,
 ) -> None:
     """
     Handle app mentions. Send user messages to Lambda function that calls ChatGPT API.
@@ -57,14 +58,20 @@ def handle_app_mentions(
     that can be used in the slack bolt's listener at this link:
     https://github.com/slackapi/bolt-python/blob/3e5f012767d37eaa01fb0ea55bd6ae364ecf320b/slack_bolt/kwargs_injection/args.py
     """
-    logger.debug(body)
+    logger.debug(f"body:{body}")
+    logger.debug(f"context:{context}")
 
     try:
         event = body["event"]
 
         if (
-            event.get("headers", {}).get("X-Slack-Retry-Num")
-            and event.get("headers", {}).get("X-Slack-Retry-Reason") == "http_timeout"
+            context.get("lambda_request", {})
+            .get("headers", {})
+            .get("X-Slack-Retry-Num")
+            and context.get("lambda_request", {})
+            .get("headers", {})
+            .get("X-Slack-Retry-Reason")
+            == "http_timeout"
         ):
             logger.info("Ignore retry request")
             return
