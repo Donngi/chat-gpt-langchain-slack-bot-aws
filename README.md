@@ -114,6 +114,7 @@ after: https://${YOUR_API_GATEWAY_ID}.execute-api.ap-northeast-1.amazonaws.com/m
 
 ## For development
 This repository is designed to have individual development settings for each lambda's Python code.
+(If you use VSCode, please directly open each `src` directory. For example: `code ${path/to/repo}/src_gateway`)
 
 Also, the following development tools are used:
 
