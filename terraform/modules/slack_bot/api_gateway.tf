@@ -37,6 +37,11 @@ resource "aws_api_gateway_deployment" "chat_gpt_langchain_slack_bot" {
   lifecycle {
     create_before_destroy = true
   }
+
+  depends_on = [
+    aws_api_gateway_method.slack_post,
+    aws_api_gateway_integration.slack_post
+  ]
 }
 
 resource "aws_api_gateway_stage" "main" {
