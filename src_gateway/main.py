@@ -108,7 +108,14 @@ def handle_app_mentions(
         lambda_client = boto3.client("lambda")
         res_invoke = lambda_client.invoke(
             FunctionName=chat_gpt_requester_lambda_arn,
-            Payload=json.dumps(structed_messages),
+            Payload=json.dumps(
+                {
+                    "thread_ts": thread_ts,
+                    "thread_messages": structed_messages,
+                    "channel": event["channel"],
+                    "wait_a_moment_ts": res_say["ts"],
+                }
+            ),
             InvocationType="Event",
         )
         logger.debug(f"res_invoke:{res_invoke}")

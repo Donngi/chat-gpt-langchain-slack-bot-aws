@@ -1,4 +1,4 @@
-data "aws_ssm_parameter" "chat_gpt_api_key" {
+data "aws_ssm_parameter" "open_ai_api_key" {
   name = "/chat-gpt-langchain-slack-bot/open-ai-api-key"
 }
 
