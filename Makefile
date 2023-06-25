@@ -1,3 +1,6 @@
+### Provision all AWS resources
+setup-all-resources: terraform-init terraform-apply-only-ecr push-images terraform-apply-auto-approve
+
 ### Terraform
 terraform-apply-only-ecr:
 	cd terraform/envs/example && \
